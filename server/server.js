@@ -23,7 +23,7 @@ app.post('/submit-form', (req, res) => {
   const { FirstName, LastName, Age, Country } = req.body;
 
   client.query(
-    `INSERT INTO company_customers ("FirstName", "LastName", "Age", "Country") VALUES ($1, $2, $3, $4) RETURNING id`,
+    `INSERT INTO customer_db ("FirstName", "LastName", "Age", "Country") VALUES ($1, $2, $3, $4) RETURNING id`,
     [FirstName, LastName, Age, Country],
     (err, result) => {
       if (err) {
@@ -35,7 +35,7 @@ app.post('/submit-form', (req, res) => {
 
       // Now retrieve the newly inserted customer details
       client.query(
-        "SELECT * FROM company_customers WHERE id = $1",
+        "SELECT * FROM customer_db WHERE id = $1",
         [newCustomerId],
         (err, selectResult) => {
           if (err) {
@@ -58,7 +58,7 @@ app.post('/update-customer', (req, res) => {
 
   // Execute the UPDATE query
   client.query(
-    `UPDATE company_customers
+    `UPDATE customer_db
      SET "FirstName" = $1, "LastName" = $2, "Age" = $3, "Country" = $4
      WHERE id = $5`,
     [FirstName, LastName, Age, Country, id],
@@ -75,7 +75,7 @@ app.post('/update-customer', (req, res) => {
 
       // Retrieve the updated customer details
       client.query(
-        "SELECT * FROM company_customers WHERE id = $1 ORDER BY id ASC",
+        "SELECT * FROM customer_db WHERE id = $1 ORDER BY id ASC",
         [id],
         (err, selectResult) => {
           if (err) {
@@ -95,7 +95,7 @@ app.post('/update-customer', (req, res) => {
 //   const {FirstName, LastName, Age, Country, id} = req.body;
 
 //   client.query(
-//     `UPDATE COMPANY_CUSTOMERS SET "FirstName" = $1, "LastName" = $2, "Age" = $3, "Country" = $4 WHERE id = $5`,
+//     `UPDATE customer_db SET "FirstName" = $1, "LastName" = $2, "Age" = $3, "Country" = $4 WHERE id = $5`,
 //     [FirstName, LastName, Age, Country, id],
 //     (err,result) =>{
 //       if (err){
@@ -107,7 +107,7 @@ app.post('/update-customer', (req, res) => {
 
 //       // Now retrieve the updated customer details
 //       client.query(
-//         "SELECT * FROM company_customers WHERE id = $1",
+//         "SELECT * FROM customer_db WHERE id = $1",
 //         [id],
 //         (err, selectResult) => {
 //           if (err) {
@@ -125,9 +125,10 @@ app.post('/update-customer', (req, res) => {
 
 app.get('/get-all-customers', (req, res) => {
   // SQL query to select all customers from the database
-  client.query('SELECT * FROM COMPANY_CUSTOMERS ORDER BY id ASC', (error, results) => {
+  client.query('SELECT * FROM customer_db ORDER BY id ASC', (error, results) => {
     if (error) {
       // If there's an error, send a server error response
+      console.log(error)
       return res.status(500).send('Error fetching customers');
     }
     if (results.length === 0) {
@@ -142,7 +143,7 @@ app.get('/get-all-customers', (req, res) => {
 app.delete('/delete-customer'), (req, res) => {
   const id= req.body;
   console.log(id)
-  client.query('DELETE FROM COMPANY_CUSTOMERS WHERE id =?',
+  client.query('DELETE FROM customer_db WHERE id =?',
   [id],
   (error, results) => {
     if (error) {
@@ -157,7 +158,7 @@ app.delete('/delete-customer'), (req, res) => {
 app.delete('/delete-customer', (req, res) => {
   const id = req.body.id;
   // Simulate deletion logic
-  client.query('DELETE FROM COMPANY_CUSTOMERS WHERE id = $1 ',
+  client.query('DELETE FROM customer_db WHERE id = $1 ',
     [id],
     (error, results) => {
       if (error) {
